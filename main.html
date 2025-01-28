@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Tracker with Calendar</title>
+    <style>
+        /* Previous styles remain the same */
+        
+        .container {
+            display: flex;
+        }
+
+        .calendar {
+            width: 50%;
+            margin: 20px 0;
+            background-color: pink;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day, .calendar-day-header {
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .calendar-day-header {
+            background-color: lightgray;
+            font-weight: bold;
+            min-height: 30px; /* Half the height of .calendar-day */
+        }
+
+        .calendar-day {
+            min-height: 60px;
+            background-color: magenta;
+        }
+
+        .calendar-day:hover {
+            background-color: rgb(235, 29, 235);
+            cursor: pointer;
+        }
+
+        .current-day {
+            background-color: rgb(255, 87, 219) !important;
+            font-weight: bold;
+        }
+
+        .has-entries {
+            background-color: rgb(255, 87, 219) !important;
+        }
+
+        .day-number {
+            font-size: 0.9em;
+            margin-bottom: 3px;
+        }
+
+        .entry-count {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .calendar-navigation button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            background-color: #2196F3;
+            color: pink;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .calendar-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .weekly-averages {
+            margin-top: 20px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .weekly-average {
+            margin-bottom: 5px;
+        }
+
+        .question-list {
+            width: 50%;
+            margin: 20px;
+            padding: 20px;
+            background-color: #e0f7fa; /* Changed background color */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .question-list h2 {
+            margin-bottom: 15px;
+            color: #00796b; /* Changed text color */
+        }
+
+        .question-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .question-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #ffffff; /* Changed background color */
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .no-questions {
+            background-color: #ffebee !important; /* Changed background color */
+        }
+
+        .few-questions {
+            background-color: #c8e6c9 !important; /* Changed background color */
+        }
+
+        .some-questions {
+            background-color: #a5d6a7 !important; /* Changed background color */
+        }
+
+        .many-questions {
+            background-color: #81c784 !important; /* Changed background color */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calendar">
+            <div class="calendar-header">
+                <button onclick="previousMonth()">&lt;</button>
+                <div class="calendar-title" id="calendarTitle"></div>
+                <button onclick="nextMonth()">&gt;</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <div class="question-list">
+            <h2>Questions Solved</h2>
+            <ul id="questionList"></ul>
+        </div>
+        <div class="weekly-averages" id="weeklyAverages"></div>
+    </div>
+
+    <script>
+        // Function to add entry
+        function addEntry() {
+            const questionCount = document.getElementById('questionCount').value;
+            if (!questionCount || questionCount <= 0) return;  // Added validation for positive number input
+
+            const date = new Date();
+            const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            let data = JSON.parse(localStorage.getItem('questionData')) || [];
+
+            const existingEntry = data.find(item => item.date === dateString);
+            if (existingEntry) {
+                existingEntry.count = questionCount;
+            } else {
+                data.push({ date: dateString, count: questionCount });
+            }
+
+            localStorage.setItem('questionData', JSON.stringify(data));
+            document.getElementById('questionCount').value = '';  // Clear input after adding entry
+            updateDisplay();
+        }
+
+        // Calendar variables
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        function updateCalendar() {
+            calculateAverages(); // Add this line to calculate averages before updating the calendar
+            const calendarTitle = document.getElementById('calendarTitle');
+            const calendarGrid = document.getElementById('calendarGrid');
+            
+            // Set calendar title
+            calendarTitle.textContent = 
+                new Date(currentYear, currentMonth).toLocaleString('default', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+
+            // Clear existing calendar
+            calendarGrid.innerHTML = '';
+
+            // Add day names header
+            const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            dayNames.forEach(day => {
+                const headerCell = document.createElement('div');
+                headerCell.className = 'calendar-day-header';
+                headerCell.textContent = day;
+                calendarGrid.appendChild(headerCell);
+            });
+
+            // Get first day of month
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            // Get last day of month
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            // Get stored data
+            const data = JSON.parse(localStorage.getItem('questionData'));
+
+            // Adjust first day to Monday
+            let startDay = firstDay.getDay() - 1;
+            if (startDay < 0) startDay = 6;
+
+            // Add empty cells for days before first day of month
+            for (let i = 0; i < startDay; i++) {
+                calendarGrid.appendChild(createCalendarCell(''));
+            }
+
+            // Create cells for each day of the month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const entry = data ? data.find(item => item.date === dateString) : null;
+                const isToday = new Date().toISOString().split('T')[0] === dateString;
+                
+                const cell = createCalendarCell(day);
+                if (isToday) cell.classList.add('current-day');
+                if (entry) {
+                    cell.classList.add('has-entries');
+                    cell.innerHTML = `
+                        <div class="day-number">${day}</div>
+                        <div class="entry-count">${entry.count}</div>
+                    `;
+                    if (entry.count == 0) {
+                        cell.classList.add('no-questions');
+                    } else if (entry.count == 2) {
+                        cell.classList.add('few-questions');
+                    } else if (entry.count >= 3 && entry.count <= 5) {
+                        cell.classList.add('some-questions');
+                    } else if (entry.count > 5) {
+                        cell.classList.add('many-questions');
+                    }
+                }
+                calendarGrid.appendChild(cell);
+            }
+
+            updateQuestionList();
+        }
+
+        function createCalendarCell(day) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day';
+            if (day) {
+                cell.innerHTML = `<div class="day-number">${day}</div>`;
+                cell.setAttribute('data-date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+                
+            // Add click handler to fill existing entries
+            cell.onclick = function() {
+                const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const data = JSON.parse(localStorage.getItem('questionData')) || [];
+                const entry = data.find(item => item.date === dateString);
+                
+                if (entry) {
+                    document.getElementById('questionCount').value = entry.count;
+                }
+
+                // Increase the count if it's the current date
+                if (new Date().toISOString().split('T')[0] === dateString) {
+                    if (entry) {
+                        entry.count = parseInt(entry.count) + 1;
+                    } else {
+                        data.push({ date: dateString, count: 1 });
+                    }
+                    localStorage.setItem('questionData', JSON.stringify(data));
+                    updateDisplay();
+                }
+            };
+
+            // Add right-click handler to decrease the count
+            cell.oncontextmenu = function(event) {
+                event.preventDefault();
+                const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const data = JSON.parse(localStorage.getItem('questionData')) || [];
+                const entry = data.find(item => item.date === dateString);
+
+                if (entry) {
+                    entry.count = Math.max(0, parseInt(entry.count) - 1);
+                    localStorage.setItem('questionData', JSON.stringify(data));
+                    updateDisplay();
+                }
+            };
+            }
+            cell.onclick = function() {
+                const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const data = JSON.parse(localStorage.getItem('questionData')) || [];
+                const entry = data.find(item => item.date === dateString);
+
+                // Increase the count if it's the current date
+                if (new Date().toISOString().split('T')[0] === dateString) {
+                    if (entry) {
+                        entry.count = parseInt(entry.count) + 1;
+                    } else {
+                        data.push({ date: dateString, count: 1 });
+                    }
+                    localStorage.setItem('questionData', JSON.stringify(data));
+                    updateDisplay();
+                }
+            };
+            return cell;
+        }
+
+        function previousMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar();
+        }
+
+        function updateDisplay() {
+            updateCalendar();
+            calculateAverages();
+        }
+
+        // Function to calculate weekly averages
+        function calculateAverages() {
+            const data = JSON.parse(localStorage.getItem('questionData')) || [];
+            const weeklyAverages = document.getElementById('weeklyAverages');
+            weeklyAverages.innerHTML = '';
+
+            const weeks = {};
+            data.forEach(entry => {
+                const date = new Date(entry.date);
+                const weekNumber = getWeekNumber(date);
+                if (!weeks[weekNumber]) {
+                    weeks[weekNumber] = [];
+                }
+                weeks[weekNumber].push(entry.count);
+            });
+
+            Object.keys(weeks).forEach(week => {
+                const total = weeks[week].reduce((sum, count) => sum + count, 0);
+                const average = total / weeks[week].length;
+                const weekDiv = document.createElement('div');
+                weekDiv.className = 'weekly-average';
+                weekDiv.textContent = `Week ${week}: ${average.toFixed(2)} questions/day`;
+                weeklyAverages.appendChild(weekDiv);
+            });
+        }
+
+        // Function to get week number of a date
+        function getWeekNumber(date) {
+            const startOfYear = new Date(date.getFullYear(), 0, 1);
+            const pastDaysOfYear = (date - startOfYear) / 86400000;
+            return Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+        }
+
+        // Function to update the question list
+        function updateQuestionList() {
+            const data = JSON.parse(localStorage.getItem('questionData')) || [];
+            const questionList = document.getElementById('questionList');
+            questionList.innerHTML = '';
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const entry = data.find(item => item.date === dateString);
+                const listItem = document.createElement('li');
+                listItem.textContent = `Day ${day}: ${entry ? entry.count : 0} questions`;
+                questionList.appendChild(listItem);
+            }
+        }
+
+        // Call to initially render the calendar and averages
+        updateDisplay();
+    </script>
+</body>
+</html>
