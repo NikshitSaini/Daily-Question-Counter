@@ -1,0 +1,139 @@
+/* style.css */
+
+.container {
+    display: flex;
+}
+
+.calendar {
+    width: 50%;
+    margin: 20px 0;
+    background-color: pink;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day, .calendar-day-header {
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    position: relative;
+}
+
+.calendar-day-header {
+    background-color: lightgray;
+    font-weight: bold;
+    min-height: 30px; /* Half the height of .calendar-day */
+}
+
+.calendar-day {
+    min-height: 60px;
+    background-color: magenta;
+}
+
+.calendar-day:hover {
+    background-color: rgb(235, 29, 235);
+    cursor: pointer;
+}
+
+.current-day {
+    background-color: rgb(255, 87, 219) !important;
+    font-weight: bold;
+}
+
+.has-entries {
+    background-color: rgb(255, 87, 219) !important;
+}
+
+.day-number {
+    font-size: 0.9em;
+    margin-bottom: 3px;
+}
+
+.entry-count {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.calendar-navigation button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #2196F3;
+    color: pink;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.calendar-title {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.weekly-averages {
+    margin-top: 20px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.weekly-average {
+    margin-bottom: 5px;
+}
+
+.question-list {
+    width: 50%;
+    margin: 20px;
+    padding: 20px;
+    background-color: #e0f7fa; /* Changed background color */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.question-list h2 {
+    margin-bottom: 15px;
+    color: #00796b; /* Changed text color */
+}
+
+.question-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.question-list li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #ffffff; /* Changed background color */
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.no-questions {
+    background-color: #ffebee !important; /* Changed background color */
+}
+
+.few-questions {
+    background-color: #c8e6c9 !important; /* Changed background color */
+}
+
+.some-questions {
+    background-color: #a5d6a7 !important; /* Changed background color */
+}
+
+.many-questions {
+    background-color: #81c784 !important; /* Changed background color */
+}
