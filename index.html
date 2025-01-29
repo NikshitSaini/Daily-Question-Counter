@@ -290,19 +290,23 @@
                 }
             };
 
-            // Add right-click handler to decrease the count
+            // Add right-click handler to decrease the count only for current day
             cell.oncontextmenu = function(event) {
                 event.preventDefault();
                 const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const data = JSON.parse(localStorage.getItem('questionData')) || [];
                 const entry = data.find(item => item.date === dateString);
 
-                if (entry) {
-                    entry.count = Math.max(0, parseInt(entry.count) - 1);
-                    localStorage.setItem('questionData', JSON.stringify(data));
-                    updateDisplay();
+                // Decrease the count only if it's the current date
+                if (new Date().toISOString().split('T')[0] === dateString) {
+                    if (entry) {
+                        entry.count = Math.max(0, parseInt(entry.count) - 1);
+                        localStorage.setItem('questionData', JSON.stringify(data));
+                        updateDisplay();
+                    }
                 }
             };
+            
             }
             cell.onclick = function() {
                 const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
