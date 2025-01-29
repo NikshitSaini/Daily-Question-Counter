@@ -3,7 +3,16 @@
 .container {
     display: flex;
 }
-
+.monthly-average {
+    margin-top: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.weekly-average{
+    margin-top: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
 .calendar {
     width: 50%;
     margin: 20px 0;
@@ -99,11 +108,24 @@
     width: 50%;
     margin: 20px;
     padding: 20px;
-    background-color: #e0f7fa; /* Changed background color */
+    background-color: #e0f7fa;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+.question-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.question-day {
+    width: 30%;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
 .question-list h2 {
     margin-bottom: 15px;
     color: #00796b; /* Changed text color */

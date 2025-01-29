@@ -206,9 +206,21 @@ function calculateAverages() {
         const average = total / weeks[week].length;
         const weekDiv = document.createElement('div');
         weekDiv.className = 'weekly-average';
-        weekDiv.textContent = `Week ${week}: ${average.toFixed(2)} questions/day`;
+        weekDiv.textContent = `Week Average ${week} : ${average.toFixed(2)} questions/day`;
         weeklyAverages.appendChild(weekDiv);
     });
+
+    // Calculate month average
+    const monthData = data.filter(entry => {
+        const date = new Date(entry.date);
+        return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
+    });
+    const monthTotal = monthData.reduce((sum, entry) => sum + entry.count, 0);
+    const monthAverage = monthTotal / monthData.length;
+    const monthDiv = document.createElement('div');
+    monthDiv.className = 'monthly-average';
+    monthDiv.textContent = `Month Average: ${monthAverage.toFixed(2)} question/day`;
+    weeklyAverages.appendChild(monthDiv);
 }
 
 // Function to get week number of a date
@@ -225,12 +237,23 @@ function updateQuestionList() {
     questionList.innerHTML = '';
 
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const entry = data.find(item => item.date === dateString);
-        const listItem = document.createElement('li');
-        listItem.textContent = `Day ${day}: ${entry ? entry.count : 0} questions`;
-        questionList.appendChild(listItem);
+    for (let i = 1; i <= daysInMonth; i += 3) {
+        const row = document.createElement('div');
+        row.className = 'question-row';
+
+        for (let j = 0; j < 3; j++) {
+            const day = i + j;
+            if (day > daysInMonth) break;
+
+            const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const entry = data.find(item => item.date === dateString);
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'question-day';
+            dayDiv.textContent = `Day ${day}: ${entry ? entry.count : 0} questions`;
+            row.appendChild(dayDiv);
+        }
+
+        questionList.appendChild(row);
     }
 }
 
