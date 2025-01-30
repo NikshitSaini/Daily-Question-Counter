@@ -231,6 +231,8 @@ function getWeekNumber(date) {
 }
 
 // Function to update the question list
+// Function to update the question list
+// Function to update the question list
 function updateQuestionList() {
     const data = JSON.parse(localStorage.getItem('questionData')) || [];
     const questionList = document.getElementById('questionList');
@@ -250,12 +252,86 @@ function updateQuestionList() {
             const dayDiv = document.createElement('div');
             dayDiv.className = 'question-day';
             dayDiv.textContent = `Day ${day}: ${entry ? entry.count : 0} questions`;
+            dayDiv.setAttribute('data-date', dateString);
             row.appendChild(dayDiv);
         }
 
         questionList.appendChild(row);
     }
+    const today = new Date();
+    const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    questionList.setAttribute('data-date', todayString);
+    updateNotesDivision(todayString);
 }
+// Function to save notes
+function saveNotes() {
+    const notesText = document.getElementById('notes-textarea').value;
+    const date = document.getElementById('questionList').getAttribute('data-date');
+    const notesData = JSON.parse(localStorage.getItem('notesData')) || {};
+    notesData[date] = notesText;
+    localStorage.setItem('notesData', JSON.stringify(notesData));
+    updateNotesList();
+}
+
+// Function to update notes list
+function updateNotesList() {
+    const notesList = document.getElementById('notes-list');
+    notesList.innerHTML = '';
+    const notesData = JSON.parse(localStorage.getItem('notesData')) || {};
+    Object.keys(notesData).forEach(date => {
+        const notesListItem = document.createElement('div');
+        notesListItem.className = 'notes-list-item';
+        notesListItem.textContent = `Date: ${date} - Notes: ${notesData[date]}`;
+        notesList.appendChild(notesListItem);
+    });
+}
+
+function updateNotesDivision(date) {
+    const notesData = JSON.parse(localStorage.getItem('notesData')) || {};
+    const notesText = notesData[date] || '';
+    document.getElementById('notes-textarea').value = notesText;
+    document.getElementById('questionList').setAttribute('data-date', date);
+    document.getElementById('notes-date').textContent = `Notes for: ${date}`; // Add this line
+    document.getElementById('notes-textarea').focus();
+}
+
+// Add event listener to question list items
+document.getElementById('questionList').addEventListener('click', function(event) {
+    if (event.target.tagName === 'DIV') {
+        const date = event.target.getAttribute('data-date');
+        updateNotesDivision(date);
+    }
+});
+
+// Add event listener to save notes button
+document.getElementById('save-notes-btn').addEventListener('click', saveNotes);
+
+// Function to get previous day notes
+function getPreviousDayNotes() {
+    const currentDate = document.getElementById('questionList').getAttribute('data-date');
+    const dateParts = currentDate.split('-');
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1;
+    const day = parseInt(dateParts[2]) - 1;
+    const previousDate = new Date(year, month, day);
+    const previousDateString = `${previousDate.getFullYear()}-${String(previousDate.getMonth() + 1).padStart(2, '0')}-${String(previousDate.getDate()).padStart(2, '0')}`;
+    updateNotesDivision(previousDateString);
+}
+
+// Function to get next day notes
+function getNextDayNotes() {
+    const currentDate = document.getElementById('questionList').getAttribute('data-date');
+    const dateParts = currentDate.split('-');
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1;
+    const day = parseInt(dateParts[2]) + 1;
+    const nextDate = new Date(year, month, day);
+    const nextDateString = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+    updateNotesDivision(nextDateString);
+}
+
+document.getElementById('get-previous-day-notes-btn').addEventListener('click', getPreviousDayNotes);
+document.getElementById('get-next-day-notes-btn').addEventListener('click', getNextDayNotes);
 
 // Call to initially render the calendar and averages
 updateDisplay();
