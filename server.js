@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Define the user model
-const User = mongoose.model('User ', userSchema);
+const User = mongoose.model('User', userSchema);
 
 // Middleware to parse JSON requests
 app.use(express.json());
