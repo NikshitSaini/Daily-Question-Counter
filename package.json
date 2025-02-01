@@ -1,0 +1,26 @@
+{
+  "name": "daily-question-counter",
+  "version": "1.0.0",
+  "description": "## Overview This project is a web-based application that allows users to track the number of questions they solve each day. It features a calendar view to visualize daily entries and a list view to see the questions solved on each day. Additionally, it calculates and displays weekly averages of questions solved.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NikshitSaini/Daily-Question-Counter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NikshitSaini/Daily-Question-Counter/issues"
+  },
+  "homepage": "https://github.com/NikshitSaini/Daily-Question-Counter#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.6"
+  }
+}
