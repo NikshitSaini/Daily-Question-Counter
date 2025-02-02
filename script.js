@@ -346,5 +346,11 @@ function getNextDayNotes() {
 document.getElementById('get-previous-day-notes-btn').addEventListener('click', getPreviousDayNotes);
 document.getElementById('get-next-day-notes-btn').addEventListener('click', getNextDayNotes);
 
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+}
+
+document.getElementById('toggle-theme-btn').addEventListener('click', toggleTheme);
+
 // Call to initially render the calendar and averages
 updateDisplay();
