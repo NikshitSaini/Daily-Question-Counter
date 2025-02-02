@@ -201,14 +201,21 @@ function calculateAverages() {
         weeks[weekNumber].push(entry.count);
     });
 
-    Object.keys(weeks).forEach(week => {
-        const total = weeks[week].reduce((sum, count) => sum + count, 0);
-        const average = total / weeks[week].length;
-        const weekDiv = document.createElement('div');
-        weekDiv.className = 'weekly-average';
-        weekDiv.textContent = `Week Average ${week} : ${average.toFixed(2)} questions/day`;
-        weeklyAverages.appendChild(weekDiv);
-    });
+    // Calculate current week's average
+    const currentWeekNumber = getWeekNumber(new Date());
+    const currentWeekData = weeks[currentWeekNumber] || [];
+    const currentWeekTotal = currentWeekData.reduce((sum, count) => sum + count, 0);
+    const currentWeekAverage = currentWeekTotal / currentWeekData.length;
+    const weekDiv = document.createElement('div');
+    weekDiv.className = 'weekly-average';
+    weekDiv.textContent = `Week's Average: ${currentWeekAverage.toFixed(2)} questions/day`;
+    weeklyAverages.appendChild(weekDiv);
+
+    // Add total questions for the current week
+    const totalWeekDiv = document.createElement('div');
+    totalWeekDiv.className = 'total-questions';
+    totalWeekDiv.textContent = `Total Questions This Week: ${currentWeekTotal}`;
+    weeklyAverages.appendChild(totalWeekDiv);
 
     // Calculate month average
     const monthData = data.filter(entry => {
@@ -221,6 +228,12 @@ function calculateAverages() {
     monthDiv.className = 'monthly-average';
     monthDiv.textContent = `Month Average: ${monthAverage.toFixed(2)} question/day`;
     weeklyAverages.appendChild(monthDiv);
+
+    // Add total questions for the month
+    const totalMonthDiv = document.createElement('div');
+    totalMonthDiv.className = 'total-questions';
+    totalMonthDiv.textContent = `Total Questions This Month: ${monthTotal}`;
+    weeklyAverages.appendChild(totalMonthDiv);
 }
 
 // Function to get week number of a date
