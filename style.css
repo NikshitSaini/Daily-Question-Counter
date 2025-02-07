@@ -254,30 +254,36 @@
 /* Dark theme styles */
 body.dark-theme {
     background-color: #121212;
-    color: #ffffff;
+    color: #e0e0e0;
 }
 
 body.dark-theme .calendar {
     background-color: #333333;
-    color: #ffffff;
+    color: #e0e0e0;
 }
 
 body.dark-theme .calendar-day {
-    background-color: #bbfaff; /* Light blue */
-    color: #000000; /* Black text */
+    background-color: #444444; /* Dark gray */
+    color: #FFA500; /* Orange text */
+    font-weight: bold; /* Bold text */
 }
 
 body.dark-theme .calendar-day:hover {
-    background-color: #00BFFF; /* Deep sky blue */
-    color: #000000; /* Black text */
+    background-color: #555555; /* Medium gray */
+    color: #FFA500; /* Orange text */
+    font-weight: bold; /* Bold text */
+}
+
+body.dark-theme .calendar-day-header {
+    background-color: #555555; /* Medium gray */
 }
 
 body.dark-theme .current-day {
-    background-color: #666666 !important;
+    background-color: #666666 !important; /* Lighter gray */
 }
 
 body.dark-theme .has-entries {
-    background-color: #777777 !important;
+    background-color: #777777 !important; /* Even lighter gray */
 }
 
 body.dark-theme .question-list {
@@ -298,25 +304,25 @@ body.dark-theme .notes-list-item {
 
 body.dark-theme .get-notes {
     background-color: #555555;
-    color: #ffffff;
+    color: #e0e0e0;
 }
 
 body.dark-theme .get-next-btn, 
 body.dark-theme .get-prev-btn {
     background-color: #555555;
-    color: #ffffff;
+    color: #e0e0e0;
     border: 2px solid #04AA6D;
 }
 
 body.dark-theme .get-next-btn:hover, 
 body.dark-theme .get-prev-btn:hover {
     background-color: #04AA6D;
-    color: #ffffff;
+    color: #e0e0e0;
 }
 
 body.dark-theme .weekly-averages {
     background-color: #222222;
-    color: #ffffff;
+    color: #e0e0e0;
 }
 
 body.dark-theme .no-questions {
@@ -334,8 +340,15 @@ body.dark-theme .some-questions {
 body.dark-theme .many-questions {
     background-color: #a5d6a7 !important;
 }
-#toggle-theme-btn{
-    position:inherit;
+
+body.dark-theme #notes-textarea {
+    background-color: #0e0713; /* Violet-black shade */
+    color: #e0e0e0; /* Light gray text */
+    border: 1px solid #555555; /* Medium gray border */
+}
+
+#toggle-theme-btn {
+    position: inherit;
     top: 10px;
     right: 10px;
     padding: 10px 20px;
@@ -345,7 +358,8 @@ body.dark-theme .many-questions {
     border-radius: 4px;
     cursor: pointer;
 }
-#toggle-theme-btn:hover{
+
+#toggle-theme-btn:hover {
     background-color: black;
     color: #ffffff;
 }

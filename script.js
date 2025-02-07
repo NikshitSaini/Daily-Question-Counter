@@ -348,9 +348,20 @@ document.getElementById('get-next-day-notes-btn').addEventListener('click', getN
 
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+    localStorage.setItem('theme', isDarkTheme ? 'dark' : 'light');
+}
+
+// Set the theme on initial load based on localStorage
+function setInitialTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+    }
 }
 
 document.getElementById('toggle-theme-btn').addEventListener('click', toggleTheme);
 
-// Call to initially render the calendar and averages
+// Call to initially render the calendar, averages, and set the theme
+setInitialTheme();
 updateDisplay();
