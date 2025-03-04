@@ -271,6 +271,27 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
+
+.data-controls {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+}
+
+#export-data-btn, #import-data-btn {
+    padding: 10px 20px;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#export-data-btn:hover, #import-data-btn:hover {
+    background-color: var(--primary-dark);
+}
+
 /* Media queries for mobile devices */
 @media only screen and (max-width: 768px) {
     .container {
@@ -383,6 +404,17 @@ body.dark-theme #notes-textarea {
     background: #0f172a;
     border-color: #334155;
     color: #e2e8f0;
+}
+
+body.dark-theme #export-data-btn,
+body.dark-theme #import-data-btn {
+    background-color: var(--primary);
+    color: var(--bg-light);
+}
+
+body.dark-theme #export-data-btn:hover,
+body.dark-theme #import-data-btn:hover {
+    background-color: var(--accent);
 }
 
 button {

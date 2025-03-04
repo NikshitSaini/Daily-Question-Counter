@@ -365,3 +365,75 @@ document.getElementById('toggle-theme-btn').addEventListener('click', toggleThem
 // Call to initially render the calendar, averages, and set the theme
 setInitialTheme();
 updateDisplay();
+
+// Function to export data
+function exportData() {
+    const questionData = localStorage.getItem('questionData') || '[]';
+    const notesData = localStorage.getItem('notesData') || '{}';
+    
+    const exportData = {
+        questionData: JSON.parse(questionData),
+        notesData: JSON.parse(notesData)
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
+    downloadLink.download = `question-tracker-backup-${dateString}.json`;
+    
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+}
+
+// Function to import data
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (importedData.questionData && importedData.notesData) {
+                if (confirm('This will replace your existing data. Are you sure?')) {
+                    // Clear existing data first
+                    localStorage.clear();
+                    
+                    // Set new data
+                    localStorage.setItem('questionData', JSON.stringify(importedData.questionData));
+                    localStorage.setItem('notesData', JSON.stringify(importedData.notesData));
+                    
+                    // Refresh the display
+                    updateDisplay();
+                    updateNotesList();
+                    updateCalendar();
+                    
+                    // Clear the file input
+                    event.target.value = '';
+                    
+                    alert('Data imported successfully!');
+                }
+            } else {
+                alert('Invalid data format in the imported file.');
+            }
+        } catch (error) {
+            alert('Error importing data: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Add event listeners for import/export
+document.getElementById('export-data-btn').addEventListener('click', exportData);
+document.getElementById('import-data-btn').addEventListener('click', () => {
+    document.getElementById('import-file').click();
+});
+document.getElementById('import-file').addEventListener('change', importData);
