@@ -181,6 +181,7 @@ function nextMonth() {
 }
 
 function updateDisplay() {
+    document.body.style.display = 'block'; // Ensure body is visible
     updateCalendar();
     calculateAverages();
 }
@@ -191,6 +192,84 @@ function calculateAverages() {
     const weeklyAverages = document.getElementById('weeklyAverages');
     weeklyAverages.innerHTML = '';
 
+    // Sort data by date
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Find best day
+    const bestDay = data.reduce((max, entry) => 
+        parseInt(entry.count) > parseInt(max.count) ? entry : max, 
+        { count: 0, date: 'None' }
+    );
+
+    // Calculate current streak
+    let currentStreak = 0;
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = data.length - 1; i >= 0; i--) {
+        const entryDate = new Date(data[i].date);
+        const diffDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === currentStreak && data[i].count > 0) {
+            currentStreak++;
+        } else {
+            break;
+        }
+    }
+
+    // Calculate best streak
+    let bestStreak = 0;
+    let currentBestStreak = 0;
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].count > 0) {
+            currentBestStreak++;
+            bestStreak = Math.max(bestStreak, currentBestStreak);
+        } else {
+            currentBestStreak = 0;
+        }
+    }
+
+    // Calculate total questions solved
+    const totalQuestions = data.reduce((sum, entry) => sum + parseInt(entry.count), 0);
+
+    // Calculate average questions per day
+    const totalDays = data.length;
+    const averagePerDay = totalDays > 0 ? (totalQuestions / totalDays).toFixed(2) : 0;
+
+    // Calculate days with 5+ questions
+    const highProductivityDays = data.filter(entry => parseInt(entry.count) >= 5).length;
+
+    // Create statistics HTML
+    const statistics = `
+        <div class="stats-container">
+            <div class="stat-item">
+                <h3>Current Streak</h3>
+                <p>${currentStreak} days</p>
+            </div>
+            <div class="stat-item">
+                <h3>Best Streak</h3>
+                <p>${bestStreak} days</p>
+            </div>
+            <div class="stat-item">
+                <h3>Best Day</h3>
+                <p>${bestDay.date}: ${bestDay.count} questions</p>
+            </div>
+            <div class="stat-item">
+                <h3>Total Questions</h3>
+                <p>${totalQuestions}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Average Per Day</h3>
+                <p>${averagePerDay}</p>
+            </div>
+            <div class="stat-item">
+                <h3>High Productivity Days</h3>
+                <p>${highProductivityDays} days with 5+ questions</p>
+            </div>
+        </div>
+    `;
+
+    // Add existing weekly and monthly averages
     const weeks = {};
     data.forEach(entry => {
         const date = new Date(entry.date);
@@ -234,6 +313,49 @@ function calculateAverages() {
     totalMonthDiv.className = 'total-questions';
     totalMonthDiv.textContent = `Total Questions This Month: ${monthTotal}`;
     weeklyAverages.appendChild(totalMonthDiv);
+
+    // Insert statistics before the averages
+    weeklyAverages.innerHTML = statistics + weeklyAverages.innerHTML;
+    weeklyAverages.innerHTML = `
+        <div class="stats-container">
+            <div class="stat-item">
+                <h3>Current Streak</h3>
+                <p>${currentStreak} days</p>
+            </div>
+            <div class="stat-item">
+                <h3>Best Streak</h3>
+                <p>${bestStreak} days</p>
+            </div>
+            <div class="stat-item">
+                <h3>Best Day</h3>
+                <p>${bestDay.date}: ${bestDay.count}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Total Questions</h3>
+                <p>${totalQuestions}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Week Average</h3>
+                <p>${(currentWeekTotal / Math.max(currentWeekData.length, 1)).toFixed(2)}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Month Average</h3>
+                <p>${(monthTotal / Math.max(monthData.length, 1)).toFixed(2)}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Week Total</h3>
+                <p>${currentWeekTotal}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Month Total</h3>
+                <p>${monthTotal}</p>
+            </div>
+            <div class="stat-item">
+                <h3>Productivity Days</h3>
+                <p>${highProductivityDays} (5+ solved)</p>
+            </div>
+        </div>
+    `;
 }
 
 // Function to get week number of a date

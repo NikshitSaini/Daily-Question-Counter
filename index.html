@@ -20,17 +20,19 @@
             <div class="calendar-grid" id="calendarGrid"></div>
         </div>
 
-        <div class="question-list">
-            <h2>Questions Solved</h2>
-            <button id="toggle-theme-btn">Theme</button>
-            <div class="data-controls">
-                <button id="export-data-btn">Export Data</button>
-                <input type="file" id="import-file" accept=".json" style="display: none;">
-                <button id="import-data-btn">Import Data</button>
+        <div class="right-section">
+            <div class="question-list">
+                <h2>Questions Solved</h2>
+                <button id="toggle-theme-btn">Theme</button>
+                <div class="data-controls">
+                    <button id="export-data-btn">Export Data</button>
+                    <input type="file" id="import-file" accept=".json" style="display: none;">
+                    <button id="import-data-btn">Import Data</button>
+                </div>
+                <ul id="questionList"></ul>
             </div>
-            <ul id="questionList"></ul>
+            <div class="weekly-averages" id="weeklyAverages"></div>
         </div>
-        <div class="weekly-averages" id="weeklyAverages"></div>
     </div>
     <div class="notes-section">
         <h2>Notes</h2>
