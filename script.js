@@ -419,11 +419,9 @@ function updateNotesDivision(date) {
     const notesText = notesData[date] || '';
     document.getElementById('notes-textarea').value = notesText;
     document.getElementById('questionList').setAttribute('data-date', date);
-    document.getElementById('notes-date').textContent = `Notes for: ${date}`; // Add this line
-    document.getElementById('notes-textarea').focus();
+    document.getElementById('notes-date').textContent = `Notes for: ${date}`;
 }
 
-// Add event listener to question list items
 document.getElementById('questionList').addEventListener('click', function(event) {
     if (event.target.tagName === 'DIV') {
         const date = event.target.getAttribute('data-date');
