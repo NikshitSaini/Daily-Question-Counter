@@ -1,5 +1,10 @@
 // script.js
 
+// Add this at the start of file
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
 // Function to add entry
 function addEntry() {
     const questionCount = document.getElementById('questionCount').value;
@@ -103,63 +108,51 @@ function createCalendarCell(day) {
         cell.innerHTML = `<div class="day-number">${day}</div>`;
         cell.setAttribute('data-date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
         
-    // Add click handler to fill existing entries
-    cell.onclick = function() {
-        const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const data = JSON.parse(localStorage.getItem('questionData')) || [];
-        const entry = data.find(item => item.date === dateString);
-        
-        if (entry) {
-            document.getElementById('questionCount').value = entry.count;
-        }
+        // Single click handler for increasing count
+        cell.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const scrollPos = window.scrollY;
+            const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const data = JSON.parse(localStorage.getItem('questionData')) || [];
+            const entry = data.find(item => item.date === dateString);
 
-        // Increase the count if it's the current date
-        if (new Date().toISOString().split('T')[0] === dateString) {
-            if (entry) {
-                entry.count = parseInt(entry.count) + 1;
-            } else {
-                data.push({ date: dateString, count: 1 });
-            }
-            localStorage.setItem('questionData', JSON.stringify(data));
-            updateDisplay();
-        }
-    };
-
-    // Add right-click handler to decrease the count only for current day
-    cell.oncontextmenu = function(event) {
-        event.preventDefault();
-        const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const data = JSON.parse(localStorage.getItem('questionData')) || [];
-        const entry = data.find(item => item.date === dateString);
-
-        // Decrease the count only if it's the current date
-        if (new Date().toISOString().split('T')[0] === dateString) {
-            if (entry) {
-                entry.count = Math.max(0, parseInt(entry.count) - 1);
+            if (new Date().toISOString().split('T')[0] === dateString) {
+                if (entry) {
+                    entry.count = parseInt(entry.count) + 1;
+                } else {
+                    data.push({ date: dateString, count: 1 });
+                }
                 localStorage.setItem('questionData', JSON.stringify(data));
-                updateDisplay();
+                updateDisplayAndMaintainScroll(scrollPos);
             }
-        }
-    };
-    
-    }
-    cell.onclick = function() {
-        const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const data = JSON.parse(localStorage.getItem('questionData')) || [];
-        const entry = data.find(item => item.date === dateString);
+        };
 
-        // Increase the count if it's the current date
-        if (new Date().toISOString().split('T')[0] === dateString) {
-            if (entry) {
-                entry.count = parseInt(entry.count) + 1;
-            } else {
-                data.push({ date: dateString, count: 1 });
+        // Right-click handler for decreasing count
+        cell.oncontextmenu = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const scrollPos = window.scrollY;
+            const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const data = JSON.parse(localStorage.getItem('questionData')) || [];
+            const entry = data.find(item => item.date === dateString);
+
+            if (new Date().toISOString().split('T')[0] === dateString) {
+                if (entry) {
+                    entry.count = Math.max(0, parseInt(entry.count) - 1);
+                    localStorage.setItem('questionData', JSON.stringify(data));
+                    updateDisplayAndMaintainScroll(scrollPos);
+                }
             }
-            localStorage.setItem('questionData', JSON.stringify(data));
-            updateDisplay();
-        }
-    };
+        };
+    }
     return cell;
+}
+
+// Add new function to maintain scroll position
+function updateDisplayAndMaintainScroll(scrollPos) {
+    updateDisplay();
+    window.scrollTo(0, scrollPos);
 }
 
 function previousMonth() {
