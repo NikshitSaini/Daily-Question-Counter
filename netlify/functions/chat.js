@@ -8,11 +8,7 @@ exports.handler = async function(event, context) {
     };
 
     if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: ''
-        };
+        return { statusCode: 200, headers, body: '' };
     }
 
     try {
@@ -22,55 +18,67 @@ exports.handler = async function(event, context) {
             throw new Error('Gemini API key not configured');
         }
 
-        console.log('Making request to Gemini API');
-
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-001:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: message
-                    }]
-                }]
-            })
-        });
-
-        console.log('Gemini API response status:', response.status);
-
-        const data = await response.json();
-
-        console.log('Gemini API response:', JSON.stringify(data, null, 2));
-
-        if (!response.ok) {
-            throw new Error(data.error?.message || 'Gemini API error');
+        // Improve the prompt based on the request
+        let enhancedPrompt = message;
+        if (message.toLowerCase().includes('application') || message.toLowerCase().includes('letter')) {
+            enhancedPrompt = `Act as a professional writer and create a detailed ${message}. Include all necessary components and format it properly. If it's a letter or application, include placeholders in [brackets] for customizable fields.`;
         }
 
-        // Log the entire response to understand its structure
-        console.log('Gemini API full response:', JSON.stringify(data, null, 2));
+        console.log('Making request to Gemini API');
 
-        // Check if the response contains the expected structure
-        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0] || !data.candidates[0].content.parts[0].text) {
-            throw new Error('Invalid response format from Gemini API');
+        const payload = {
+            contents: [{
+                parts: [{
+                    text: enhancedPrompt
+                }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 2048,
+                topK: 40,
+                topP: 0.95
+            }
+        };
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }
+        );
+
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Raw response:', JSON.stringify(data, null, 2));
+
+        if (!response.ok || !data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            throw new Error(data.error?.message || 'Invalid response from AI');
+        }
+
+        let formattedText = data.candidates[0].content.parts[0].text;
+        
+        // Preserve formatting for letters and applications
+        if (message.toLowerCase().includes('application') || message.toLowerCase().includes('letter')) {
+            formattedText = formattedText
+                .replace(/\n{4,}/g, '\n\n\n') // Limit consecutive newlines
+                .trim();
         }
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                message: data.candidates[0].content.parts[0].text
+                message: formattedText
             })
         };
     } catch (error) {
-        console.error('Function error details:', error);
+        console.error('Function error:', error);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({
-                error: `Error: ${error.message || 'Unknown error'}`
-            })
+            body: JSON.stringify({ error: error.message })
         };
     }
 };

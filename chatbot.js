@@ -22,7 +22,7 @@ class ChatBot {
 
         this.addMessage(message, 'user');
         this.chatInput.value = '';
-        this.addMessage('Thinking...', 'bot');
+        this.addMessage('Generating response...', 'bot');
 
         try {
             const response = await fetch('/.netlify/functions/chat', {
@@ -30,12 +30,15 @@ class ChatBot {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message })
+                body: JSON.stringify({ 
+                    message,
+                    context: localStorage.getItem('questionData') // Send study data as context
+                })
             });
 
             const data = await response.json();
             
-            // Remove "Thinking..." message
+            // Remove loading message
             this.messagesContainer.removeChild(this.messagesContainer.lastChild);
 
             if (!response.ok) {
@@ -43,9 +46,11 @@ class ChatBot {
             }
 
             if (data.message) {
-                this.addMessage(data.message, 'bot');
+                // Format the message for display
+                const formattedMessage = this.formatMessage(data.message);
+                this.addMessage(formattedMessage, 'bot');
             } else {
-                throw new Error('No response from AI');
+                throw new Error('Invalid response format');
             }
         } catch (error) {
             console.error('Chat error:', error);
@@ -55,6 +60,13 @@ class ChatBot {
             }
             this.addMessage(`Error: ${error.message}. Please try again.`, 'bot');
         }
+    }
+
+    formatMessage(text) {
+        // Preserve formatting but clean up excessive whitespace
+        return text
+            .replace(/\n{4,}/g, '\n\n\n')
+            .trim();
     }
 
     addMessage(text, sender) {

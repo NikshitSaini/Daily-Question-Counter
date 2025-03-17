@@ -1,15 +1,7 @@
 {
-  "name": "functions",
+  "name": "netlify-functions",
   "version": "1.0.0",
-  "main": "chat.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "description": ""
+    "node-fetch": "^2.6.1"
+  }
 }

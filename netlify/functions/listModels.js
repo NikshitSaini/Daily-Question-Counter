@@ -20,6 +20,8 @@ exports.handler = async function(event, context) {
             throw new Error('Gemini API key not configured');
         }
 
+        console.log('Making request to list models from Gemini API');
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`, {
             method: 'GET',
             headers: {
@@ -28,6 +30,8 @@ exports.handler = async function(event, context) {
         });
 
         const data = await response.json();
+
+        console.log('Gemini API response:', JSON.stringify(data, null, 2));
 
         if (!response.ok) {
             throw new Error(data.error?.message || 'Gemini API error');

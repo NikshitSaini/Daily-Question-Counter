@@ -192,7 +192,7 @@ body {
     min-width: 280px;
     padding: 1.75rem;
     margin: 0;
-    background-color: var(--bg-light);
+    background-color: var (--bg-light);
     border-radius: 20px;
     box-shadow: 0 8px 32px -5px rgba(0, 0, 0, 0.08);
 }
@@ -612,6 +612,10 @@ body.dark-theme button {
     margin-bottom: 1rem;
     padding: 0.75rem;
     border-radius: 8px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+    font-family: 'Inter', -apple-system, sans-serif;
 }
 
 .user-message {
@@ -626,6 +630,8 @@ body.dark-theme button {
     color: var(--text-light);
     margin-right: 20%;
     margin-left: 0;
+    font-size: 14px;
+    letter-spacing: 0.3px;
 }
 
 .chat-input-area {
