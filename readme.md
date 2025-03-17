@@ -227,4 +227,4 @@ Netlify
 Node.js
 All our contributors
 
-<p align="center">Made with ❤️ by Nikshit Saini</p> <p align="center"> <a href="https://github.com/nikshitsaini">GitHub</a> • <a href="https://linkedin.com/in/nikshitsaini">LinkedIn</a> </p>
+<p align="center">Made with ❤️ by Nikshit Saini</p> <p align="center"> <a href="https://github.com/nikshitsaini">GitHub</a> • <a href="https://linkedin.com/in/nikshit12saini">LinkedIn</a> </p>
