@@ -14,6 +14,9 @@ class ChatBot {
 
         // Add initial greeting
         this.addMessage("Hi! I'm your study assistant. I can help analyze your progress and answer questions about your learning journey.", 'bot');
+        
+        // Add resize functionality
+        this.initializeResize();
     }
 
     async sendMessage() {
@@ -72,9 +75,102 @@ class ChatBot {
     addMessage(text, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${sender}-message`;
-        messageDiv.textContent = text;
+
+        // Check if the message contains code blocks
+        if (sender === 'bot' && text.includes('```')) {
+            const parts = text.split('```');
+            let formattedText = '';
+            
+            for (let i = 0; i < parts.length; i++) {
+                if (i % 2 === 0) {
+                    // Regular text
+                    formattedText += parts[i];
+                } else {
+                    // Code block
+                    const code = parts[i].trim();
+                    formattedText += `
+                        <pre><code>${this.escapeHtml(code)}</code>
+                            <button class="expand-code-btn" onclick="chatbot.showCodeModal(this)">⛶ Expand</button>
+                        </pre>
+                    `;
+                }
+            }
+            messageDiv.innerHTML = formattedText;
+        } else {
+            messageDiv.textContent = text;
+        }
+
         this.messagesContainer.appendChild(messageDiv);
         this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    showCodeModal(button) {
+        const code = button.previousElementSibling.textContent;
+        const modal = document.createElement('div');
+        modal.className = 'code-modal';
+        modal.innerHTML = `
+            <div class="code-modal-content">
+                <div class="code-modal-buttons">
+                    <button class="code-modal-button copy-btn" onclick="chatbot.copyCode(this)">Copy</button>
+                    <button class="code-modal-button close-btn" onclick="chatbot.closeModal(this)">Close</button>
+                </div>
+                <pre><code>${code}</code></pre>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+    }
+
+    copyCode(button) {
+        const code = button.closest('.code-modal-content').querySelector('code').textContent;
+        navigator.clipboard.writeText(code);
+        button.textContent = 'Copied!';
+        setTimeout(() => button.textContent = 'Copy', 2000);
+    }
+
+    closeModal(button) {
+        const modal = button.closest('.code-modal');
+        modal.remove();
+    }
+
+    initializeResize() {
+        const chatSection = document.querySelector('.chat-section');
+        const resizeHandle = document.querySelector('.resize-handle');
+        let startY, startHeight;
+
+        resizeHandle.addEventListener('mousedown', initDrag);
+
+        function initDrag(e) {
+            startY = e.clientY;
+            startHeight = parseInt(document.defaultView.getComputedStyle(chatSection).height, 10);
+            document.documentElement.addEventListener('mousemove', doDrag);
+            document.documentElement.addEventListener('mouseup', stopDrag);
+        }
+
+        function doDrag(e) {
+            const newHeight = startHeight + e.clientY - startY;
+            const maxHeight = window.innerHeight * 0.7; // 70% of viewport height
+            
+            if (newHeight > 400 && newHeight <= maxHeight) { // Between min and max height
+                chatSection.style.height = `${newHeight}px`;
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.style.height = `${newHeight - 120}px`;
+            }
+        }
+
+        function stopDrag() {
+            document.documentElement.removeEventListener('mousemove', doDrag);
+            document.documentElement.removeEventListener('mouseup', stopDrag);
+        }
     }
 }
 
