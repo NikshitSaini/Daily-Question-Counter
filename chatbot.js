@@ -20,9 +20,9 @@ class ChatBot {
         const message = this.chatInput.value.trim();
         if (!message) return;
 
-        // Add user message to chat
         this.addMessage(message, 'user');
         this.chatInput.value = '';
+        this.addMessage('Thinking...', 'bot');
 
         try {
             const response = await fetch('/.netlify/functions/chat', {
@@ -34,11 +34,26 @@ class ChatBot {
             });
 
             const data = await response.json();
-            const botResponse = data.choices[0].message.content;
-            this.addMessage(botResponse, 'bot');
+            
+            // Remove "Thinking..." message
+            this.messagesContainer.removeChild(this.messagesContainer.lastChild);
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to get response');
+            }
+
+            if (data.message) {
+                this.addMessage(data.message, 'bot');
+            } else {
+                throw new Error('No response from AI');
+            }
         } catch (error) {
-            console.error('Error:', error);
-            this.addMessage('Sorry, I encountered an error. Please try again later.', 'bot');
+            console.error('Chat error:', error);
+            // Remove "Thinking..." message if it exists
+            if (this.messagesContainer.lastChild.textContent === 'Thinking...') {
+                this.messagesContainer.removeChild(this.messagesContainer.lastChild);
+            }
+            this.addMessage(`Error: ${error.message}. Please try again.`, 'bot');
         }
     }
 
