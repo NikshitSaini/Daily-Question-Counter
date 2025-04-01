@@ -106,18 +106,25 @@ function createCalendarCell(day) {
     cell.className = 'calendar-day';
     if (day) {
         cell.innerHTML = `<div class="day-number">${day}</div>`;
-        cell.setAttribute('data-date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+        const cellDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        cell.setAttribute('data-date', cellDate);
         
         // Single click handler for increasing count
         cell.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
             const scrollPos = window.scrollY;
-            const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dateString = cellDate;
             const data = JSON.parse(localStorage.getItem('questionData')) || [];
             const entry = data.find(item => item.date === dateString);
 
-            if (new Date().toISOString().split('T')[0] === dateString) {
+            // Allow modifications for current and past dates
+            const clickedDate = new Date(dateString);
+            clickedDate.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (clickedDate <= today) {
                 if (entry) {
                     entry.count = parseInt(entry.count) + 1;
                 } else {
@@ -133,16 +140,20 @@ function createCalendarCell(day) {
             event.preventDefault();
             event.stopPropagation();
             const scrollPos = window.scrollY;
-            const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dateString = cellDate;
             const data = JSON.parse(localStorage.getItem('questionData')) || [];
             const entry = data.find(item => item.date === dateString);
 
-            if (new Date().toISOString().split('T')[0] === dateString) {
-                if (entry) {
-                    entry.count = Math.max(0, parseInt(entry.count) - 1);
-                    localStorage.setItem('questionData', JSON.stringify(data));
-                    updateDisplayAndMaintainScroll(scrollPos);
-                }
+            // Allow modifications for current and past dates
+            const clickedDate = new Date(dateString);
+            clickedDate.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (clickedDate <= today && entry) {
+                entry.count = Math.max(0, parseInt(entry.count) - 1);
+                localStorage.setItem('questionData', JSON.stringify(data));
+                updateDisplayAndMaintainScroll(scrollPos);
             }
         };
     }
