@@ -229,20 +229,25 @@ body {
 }
 
 .no-questions {
-    background: linear-gradient(145deg, var(--danger), #dc2626) !important; /* Changed background color */
+    background: linear-gradient(145deg, var(--danger), #dc2626) !important;
 }
 
 .few-questions {
-    background: linear-gradient(145deg, var(--warning), #d97706) !important; /* Changed background color */
+    background: linear-gradient(145deg, #FF8C00, #FFA500) !important; /* For count=1,3 */
 }
 
-.some-questions {
-    background: linear-gradient(145deg, var (--accent), #0891b2) !important; /* Changed background color */
+.medium-questions {
+    background: linear-gradient(145deg, #FFD700, #FFC000) !important; /* For count=2 */
+}
+
+.high-questions {
+    background: linear-gradient(145deg, #87CEEB, #4682B4) !important; /* For count=4,5 */
 }
 
 .many-questions {
-    background: linear-gradient(145deg, var(--success), #16a34a) !important; /* Changed background color */
+    background: linear-gradient(145deg, var(--success), #16a34a) !important; /* For count>5 */
 }
+
 .notes-section {
     width: 95%; /* Match container width */
     margin: 2rem auto;
@@ -660,8 +665,12 @@ body.dark-theme .few-questions {
     background-color: #66bb6a !important;
 }
 
-body.dark-theme .some-questions {
-    background-color: #81c784 !important;
+body.dark-theme .medium-questions {
+    background-color: #FFD700 !important;
+}
+
+body.dark-theme .high-questions {
+    background-color: #87CEEB !important;
 }
 
 body.dark-theme .many-questions {
@@ -847,7 +856,6 @@ body.dark-theme button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-}
 
 /* Dark theme support */
 body.dark-theme .chat-section {

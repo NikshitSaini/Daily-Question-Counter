@@ -87,10 +87,12 @@ function updateCalendar() {
             `;
             if (entry.count == 0) {
                 cell.classList.add('no-questions');
-            } else if (entry.count == 2) {
+            } else if (entry.count == 1 || entry.count == 3) {
                 cell.classList.add('few-questions');
-            } else if (entry.count >= 3 && entry.count <= 5) {
-                cell.classList.add('some-questions');
+            } else if (entry.count == 2) {
+                cell.classList.add('medium-questions');
+            } else if (entry.count == 4 || entry.count == 5) {
+                cell.classList.add('high-questions');
             } else if (entry.count > 5) {
                 cell.classList.add('many-questions');
             }
