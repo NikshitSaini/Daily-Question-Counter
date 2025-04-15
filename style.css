@@ -856,6 +856,7 @@ body.dark-theme button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
+}
 
 /* Dark theme support */
 body.dark-theme .chat-section {
